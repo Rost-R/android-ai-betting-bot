@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI Прогнозы</string>
+
+    <!-- Home Screen -->
+    <string name="home_balance">Баланс: %d прогнозов</string>
+    <string name="home_vip_active">VIP до: %s</string>
+    <string name="home_vip_inactive">VIP: не активна</string>
+
+    <!-- Actions -->
+    <string name="action_get_prediction">🎯 Получить прогноз</string>
+    <string name="action_select_match">📋 Выбрать матч</string>
+    <string name="action_express_day">🔥 Экспресс дня</string>
+    <string name="action_vip_subscription">👑 VIP Подписка</string>
+    <string name="action_buy_balance">💰 Пополнить баланс</string>
+
+    <!-- Disclaimer -->
+    <string name="disclaimer">⚠️ Прогнозы носят информационный характер</string>
+
+    <!-- Errors -->
+    <string name="error_network">Ошибка сети. Проверьте подключение.</string>
+    <string name="error_generic">Произошла ошибка. Попробуйте позже.</string>
+</resources>
