@@ -1,9 +1,22 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+}
+
+// Читаем API ключи из local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+fun getApiKey(key: String): String {
+    return localProperties.getProperty(key) ?: System.getenv(key) ?: ""
 }
 
 android {
@@ -26,17 +39,17 @@ android {
         // RuStore configuration
         buildConfigField("String", "RUSTORE_APP_ID", "\"com.aiprognoz.betting\"")
         buildConfigField("String", "RUSTORE_DEEPLINK", "\"aiprognoz\"")
+
+        // API Keys (читаем из local.properties)
+        buildConfigField("String", "OPENAI_API_KEY", "\"${getApiKey("OPENAI_API_KEY")}\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"${getApiKey("GEMINI_API_KEY")}\"")
+        buildConfigField("String", "ODDS_API_KEY", "\"${getApiKey("ODDS_API_KEY")}\"")
     }
 
     buildTypes {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
-
-            // API Keys from environment variables (DEBUG)
-            buildConfigField("String", "OPENAI_API_KEY", "\"${System.getenv("OPENAI_API_KEY") ?: ""}\"")
-            buildConfigField("String", "GEMINI_API_KEY", "\"${System.getenv("GEMINI_API_KEY") ?: ""}\"")
-            buildConfigField("String", "ODDS_API_KEY", "\"${System.getenv("ODDS_API_KEY") ?: ""}\"")
         }
         release {
             isMinifyEnabled = true
@@ -45,11 +58,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
-            // API Keys from environment variables (PRODUCTION)
-            buildConfigField("String", "OPENAI_API_KEY", "\"${System.getenv("OPENAI_API_KEY_PROD") ?: ""}\"")
-            buildConfigField("String", "GEMINI_API_KEY", "\"${System.getenv("GEMINI_API_KEY_PROD") ?: ""}\"")
-            buildConfigField("String", "ODDS_API_KEY", "\"${System.getenv("ODDS_API_KEY_PROD") ?: ""}\"")
         }
     }
 
@@ -130,11 +138,11 @@ dependencies {
     // Google Gemini AI SDK
     implementation("com.google.ai.client.generativeai:generativeai:0.1.2")
 
-    // RuStore Billing SDK
-    implementation("ru.rustore.sdk:billingclient:6.0.0")
+    // RuStore Billing SDK (временно отключено - используем заглушку)
+    // implementation("ru.rustore.sdk:billingclient:6.0.0")
 
-    // YooKassa Payment SDK
-    implementation("ru.yoomoney.sdk.kassa.payments:yookassa-android-sdk:6.8.0")
+    // YooKassa Payment SDK (будет добавлено позже)
+    // implementation("ru.yoomoney.sdk.kassa.payments:yookassa-android-sdk:6.8.0")
 
     // Coil (Image Loading)
     implementation("io.coil-kt:coil-compose:2.5.0")

@@ -1,22 +1,28 @@
 package com.aiprognoz.betting.presentation.screens.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
-/**
- * Главный экран приложения
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val user by viewModel.user.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -24,7 +30,12 @@ fun HomeScreen(navController: NavController) {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                actions = {
+                    IconButton(onClick = { navController.navigate("profile") }) {
+                        Icon(Icons.Default.Person, contentDescription = "Профиль")
+                    }
+                }
             )
         }
     ) { padding ->
@@ -37,7 +48,9 @@ fun HomeScreen(navController: NavController) {
         ) {
             // User Info Card
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { navController.navigate("profile") },
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
@@ -46,13 +59,17 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "💰 Баланс: 0 прогнозов",
+                        text = "💰 Баланс: ${user?.balance ?: 0} прогнозов",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "👑 VIP: не активна",
+                        text = if (user?.isVipActive == true) {
+                            "👑 VIP: активна"
+                        } else {
+                            "👑 VIP: не активна"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -67,33 +84,27 @@ fun HomeScreen(navController: NavController) {
             )
 
             HomeActionButton(
-                icon = Icons.Default.Star,
-                text = "🎯 Получить прогноз",
-                onClick = { /* TODO: Navigate to prediction */ }
-            )
-
-            HomeActionButton(
                 icon = Icons.Default.List,
                 text = "📋 Выбрать матч",
-                onClick = { /* TODO: Navigate to matches */ }
+                onClick = { navController.navigate("matches") }
             )
 
             HomeActionButton(
                 icon = Icons.Default.Favorite,
                 text = "🔥 Экспресс дня",
-                onClick = { /* TODO: Navigate to express */ }
+                onClick = { navController.navigate("express") }
             )
 
             HomeActionButton(
                 icon = Icons.Default.Star,
                 text = "👑 VIP Подписка",
-                onClick = { /* TODO: Navigate to VIP */ }
+                onClick = { navController.navigate("vip") }
             )
 
             HomeActionButton(
                 icon = Icons.Default.ShoppingCart,
                 text = "💰 Пополнить баланс",
-                onClick = { /* TODO: Navigate to payment */ }
+                onClick = { navController.navigate("payment") }
             )
 
             Spacer(modifier = Modifier.weight(1f))

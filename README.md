@@ -31,32 +31,43 @@ Android приложение для спортивных прогнозов с A
 
 ```bash
 cd ~/projects
-git clone <your-repository-url> android-ai-betting-bot
+git clone https://github.com/Rost-R/android-ai-betting-bot.git
 cd android-ai-betting-bot
 ```
 
 ### 2. Настройка API ключей
 
-Создайте переменные окружения (или добавьте в `local.properties`):
+Создайте файл `local.properties` в корне проекта:
 
-```bash
-export OPENAI_API_KEY="sk-proj-your-key-here"
-export GEMINI_API_KEY="your-gemini-key-here"
-export ODDS_API_KEY="your-odds-api-key-here"
+```properties
+sdk.dir=/path/to/Android/sdk
+OPENAI_API_KEY=sk-proj-your-key-here
+GEMINI_API_KEY=your-gemini-key-here
+ODDS_API_KEY=your-odds-api-key-here
 ```
 
 ### 3. Настройка Firebase
 
 1. Создайте проект в [Firebase Console](https://console.firebase.google.com/)
 2. Добавьте Android приложение с package name: `com.aiprognoz.betting`
-3. Скачайте `google-services.json`
-4. Поместите в `app/google-services.json`
+3. Включите методы аутентификации: Email/Password и Anonymous
+4. Скачайте `google-services.json`
+5. Поместите в `app/google-services.json`
 
-### 4. Запуск в Android Studio
+### 4. Сборка и запуск
 
-1. Откройте проект в Android Studio
-2. Sync Gradle
-3. Запустите на эмуляторе или устройстве (Android 7.0+)
+```bash
+# Сборка debug APK
+./gradlew assembleDebug
+
+# Установка на эмулятор/устройство
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+
+# Запуск
+adb shell am start -n com.aiprognoz.betting/.MainActivity
+```
+
+Или откройте проект в Android Studio и нажмите Run.
 
 ---
 
@@ -70,22 +81,22 @@ android-ai-betting-bot/
 │   │   │   ├── screens/
 │   │   │   │   ├── home/          # Главный экран
 │   │   │   │   ├── matches/       # Список матчей
-│   │   │   │   ├── prediction/    # Прогноз
-│   │   │   │   ├── express/       # Экспресс дня
-│   │   │   │   ├── vip/           # VIP подписка
+│   │   │   │   ├── prediction/    # Прогноз матча
+│   │   │   │   ├── auth/          # Авторизация
+│   │   │   │   ├── payment/       # Оплата
 │   │   │   │   └── profile/       # Профиль
 │   │   │   ├── theme/             # Material 3 Theme
 │   │   │   └── navigation/        # Навигация
 │   │   │
 │   │   ├── domain/                # Business Logic
-│   │   │   ├── models/            # Data models
-│   │   │   ├── usecases/          # Use cases
+│   │   │   ├── model/             # Data models
 │   │   │   └── repository/        # Repository interfaces
 │   │   │
 │   │   ├── data/                  # Data Layer
-│   │   │   ├── remote/            # API clients
+│   │   │   ├── remote/            # API clients (Odds, OpenAI, Gemini)
 │   │   │   ├── local/             # Room Database
-│   │   │   ├── payment/           # RuStore + YooKassa
+│   │   │   ├── auth/              # Firebase Auth
+│   │   │   ├── payment/           # RuStore Billing
 │   │   │   └── repository/        # Repository implementations
 │   │   │
 │   │   ├── di/                    # Hilt DI modules
@@ -114,6 +125,8 @@ android-ai-betting-bot/
 | 100 прогнозов | 500₽ | Скидка 50% |
 | **VIP подписка** | **299₽/мес** | Ежедневные экспрессы (GPT-4o + Gemini) |
 
+> **Примечание**: Платежи через RuStore временно работают в демо-режиме.
+
 ---
 
 ## 🔐 Безопасность API ключей
@@ -121,7 +134,7 @@ android-ai-betting-bot/
 ⚠️ **КРИТИЧЕСКИ ВАЖНО**: API ключи могут быть извлечены из APK!
 
 ### Рекомендации:
-1. ✅ Использовать переменные окружения (не коммитить в Git)
+1. ✅ Использовать `local.properties` (не коммитить в Git)
 2. ✅ Ограничить лимиты на стороне провайдеров API
 3. ✅ ProGuard обфускация (включена в release)
 4. ⚠️ Рассмотреть NDK + C++ для критичных ключей
@@ -181,7 +194,7 @@ android-ai-betting-bot/
 ## 🐛 Известные проблемы и решения
 
 ### 1. API ключи не работают
-- Проверьте переменные окружения
+- Проверьте `local.properties`
 - Убедитесь что ключи корректны (OpenAI, Gemini, The Odds API)
 
 ### 2. Firebase не инициализирован
@@ -189,27 +202,23 @@ android-ai-betting-bot/
 - Проверьте `package name` в Firebase Console
 
 ### 3. RuStore Billing не работает
-- Добавьте репозиторий VK в `settings.gradle.kts`
-- Проверьте `consoleApplicationId` в коде
+- Платежи временно в демо-режиме
+- Для production: интегрируйте реальный RuStore SDK
 
 ---
 
 ## 📊 План разработки
 
-Полный план: [plan.md](../.claude/plans/dynamic-cooking-toucan.md)
-
 **Этапы:**
-- [x] ✅ Этап 1: Настройка проекта (ЗАВЕРШЕН)
-- [ ] 🔄 Этап 2: Core функционал (Room, The Odds API)
-- [ ] 🔄 Этап 3: AI интеграции (OpenAI, Gemini)
-- [ ] 🔄 Этап 4: Авторизация (Firebase Auth)
-- [ ] 🔄 Этап 5: UI/UX (все экраны)
-- [ ] 🔄 Этап 6: Платежная система (RuStore, YooKassa)
-- [ ] 🔄 Этап 7: Дополнительные функции
+- [x] ✅ Этап 1: Настройка проекта
+- [x] ✅ Этап 2: Core функционал (Room Database, The Odds API)
+- [x] ✅ Этап 3: AI интеграции (OpenAI GPT-4o, Google Gemini)
+- [x] ✅ Этап 4: Авторизация (Firebase Auth)
+- [x] ✅ Этап 5: UI/UX (все экраны на Jetpack Compose)
+- [x] ✅ Этап 6: Платежная система (RuStore Billing - демо режим)
+- [ ] 🔄 Этап 7: Дополнительные функции (экспрессы, статистика)
 - [ ] 🔄 Этап 8: Тестирование
 - [ ] 🔄 Этап 9: Публикация в RuStore
-
-**Общее время разработки**: 23-35 дней
 
 ---
 
@@ -221,10 +230,10 @@ android-ai-betting-bot/
 
 ## 👨‍💻 Разработка
 
-Создано на базе Telegram бота с использованием:
+Создано с использованием:
 - Clean Architecture
 - MVVM Pattern
 - Kotlin Coroutines
 - Jetpack Compose
 
-**Следующий шаг**: Разработка Core функционала (Room Database + The Odds API интеграция)
+**Текущий статус**: MVP готов к тестированию. Основной функционал реализован.
